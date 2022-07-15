@@ -2,14 +2,22 @@ const Operation = require("../models/Operation");
 // const fs = require("fs");
 
 exports.createOperation = (req, res, next) => {
-	// console.log(req.query);
+	// console.log(req.body);
 	delete req.body._id;
 	// delete req.body.userId;
 	const operation = new Operation({
-		// ...req.body,
-		...req.query,
+		montant: req.body._montant,
+		type: req.body._type,
+		categorie: req.body._categorie,
+		compte: req.body._compte,
+		description1: req.body._description1,
+		description2: req.body._description2,
+		operationDate: req.body._operationDate,
+		...req.body,
+		// ...req.query,
 		userId: 1,
 	});
+	// console.log("operation", operation);
 	operation
 		.save()
 		.then(() => res.status(201).json({ message: "Operation enregistré !" }))
@@ -23,10 +31,11 @@ exports.getOneOperation = (req, res, then) => {
 };
 
 exports.updateOneOperation = (req, res, next) => {
+	// console.log("update", req.body);
 	Operation.updateOne(
 		{ _id: req.params.id },
 		{
-			...req.body,
+			...req.body.operation,
 			_id: req.params.id,
 			userId: 1,
 		}
