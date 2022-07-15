@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "express": "^4.18.1",
+    "mongoose": "^6.4.4"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "comptesb-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
