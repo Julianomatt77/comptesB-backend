@@ -2,7 +2,6 @@ const Operation = require("../models/Operation");
 // const fs = require("fs");
 
 exports.createOperation = (req, res, next) => {
-	// console.log(req.body);
 	delete req.body._id;
 	// delete req.body.userId;
 	const operation = new Operation({

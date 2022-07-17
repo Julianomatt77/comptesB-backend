@@ -2,12 +2,14 @@ const Compte = require("../models/Compte");
 // const fs = require("fs");
 
 exports.createAccount = (req, res, next) => {
-	// console.log(req.query);
 	delete req.body._id;
 	// delete req.body.userId;
 	const compte = new Compte({
 		// ...req.body,
-		...req.query,
+		name: req.body._name,
+		typeCompte: req.body._typeCompte,
+		soldeInitial: req.body._soldeInitial,
+		soldeActuel: req.body._soldeInitial,
 		userId: 1,
 	});
 	compte
@@ -26,7 +28,7 @@ exports.updateOneAccount = (req, res, next) => {
 	Compte.updateOne(
 		{ _id: req.params.id },
 		{
-			...req.body,
+			...req.body.compte,
 			_id: req.params.id,
 			userId: 1,
 		}

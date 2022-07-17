@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const compteSchema = mongoose.Schema({
 	name: { type: String, required: true },
 	userId: { type: String, required: true },
-	solde: { type: Number, required: true },
+	typeCompte: { type: String, required: true },
+	soldeInitial: { type: Number, required: true },
+	soldeActuel: { type: Number, required: true },
 });
 
 module.exports = mongoose.model("Compte", compteSchema);
