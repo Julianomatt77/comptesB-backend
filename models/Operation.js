@@ -9,6 +9,7 @@ const operationSchema = mongoose.Schema({
 	description2: { type: String, required: false },
 	userId: { type: String, required: true },
 	operationDate: { type: Date, required: true },
+	solde: { type: Number, required: true },
 });
 
 module.exports = mongoose.model("Operation", operationSchema);

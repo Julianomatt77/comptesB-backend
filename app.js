@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
 const dbConfig = require("./config/database.config.js");
+var cors = require("cors");
 
 const comptesRoutes = require("./routes/comptesB-route");
 const operationsRoutes = require("./routes/operation-route");
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 	res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
 	next();
 });
+app.options("*", cors());
 
 app.use("/api/comptes", comptesRoutes);
 app.use("/api/operations", operationsRoutes);

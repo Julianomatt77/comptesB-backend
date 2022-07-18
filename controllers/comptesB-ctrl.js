@@ -49,3 +49,37 @@ exports.deleteAccount = (req, res, next) => {
 		.then(() => res.status(200).json({ message: "Compte supprimé !" }))
 		.catch((error) => res.status(400).json({ error }));
 };
+
+exports.updateSolde = (req, res, next) => {
+	Compte.findOne({ name: req.params.name })
+		.then((compte) => {
+			console.log(compte);
+			console.log(req.body);
+			Compte.updateOne(
+				{ _id: compte._id },
+				{
+					_id: compte._id,
+					name: compte.name,
+					typeCompte: compte.typeCompte,
+					soldeInitial: compte.soldeInitial,
+					userId: compte.userId,
+					soldeActuel: req.body.solde,
+				}
+			)
+				.then(() => {
+					// console.log(compte);
+					res.status(200).json({ message: "Compte modifié!" });
+				})
+				.catch((error) => {
+					console.log(req.body);
+					res.status(401).json({ error });
+				});
+		})
+		.catch((error) => res.status(400).json({ error }));
+};
+
+exports.getOneAccountByName = (req, res, then) => {
+	Compte.findOne({ name: req.params.name })
+		.then((compte) => res.status(200).json(compte))
+		.catch((error) => res.status(400).json({ error }));
+};

@@ -12,6 +12,7 @@ exports.createOperation = (req, res, next) => {
 		description1: req.body._description1,
 		description2: req.body._description2,
 		operationDate: req.body._operationDate,
+		solde: req.body._solde,
 		...req.body,
 		// ...req.query,
 		userId: 1,
@@ -44,7 +45,9 @@ exports.updateOneOperation = (req, res, next) => {
 };
 
 exports.getAllOperations = (req, res, next) => {
+	var sortByDate = { operationDate: -1 };
 	Operation.find()
+		.sort(sortByDate)
 		.then((operations) => res.status(200).json(operations))
 		.catch((error) => res.status(400).json({ error }));
 	// res.status(200).json({ message: "ok" });

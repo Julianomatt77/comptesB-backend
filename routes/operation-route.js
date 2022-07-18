@@ -4,10 +4,10 @@ const router = express.Router();
 
 const operationCtrl = require("../controllers/operation-ctrl");
 
-router.get("/", operationCtrl.getAllOperations);
-router.post("/", operationCtrl.createOperation);
-router.get("/:id", operationCtrl.getOneOperation);
-router.post("/:id", operationCtrl.updateOneOperation);
-router.delete("/:id", operationCtrl.deleteOperation);
+router.get("/getAllOperations", operationCtrl.getAllOperations);
+router.post("/createOperation", operationCtrl.createOperation);
+router.get("/getOneOperation/:id", operationCtrl.getOneOperation);
+router.post("/updateOneOperation/:id", operationCtrl.updateOneOperation);
+router.delete("/deleteOperation/:id", operationCtrl.deleteOperation);
 
 module.exports = router;
