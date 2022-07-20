@@ -7,8 +7,7 @@ var cors = require("cors");
 
 const comptesRoutes = require("./routes/comptesB-route");
 const operationsRoutes = require("./routes/operation-route");
-// const stuffRoutes = require("./routes/stuff");
-// const userRoutes = require("./routes/user");
+const userRoutes = require("./routes/user-route");
 
 app.use(express.json());
 
@@ -30,8 +29,6 @@ app.options("*", cors());
 
 app.use("/api/comptes", comptesRoutes);
 app.use("/api/operations", operationsRoutes);
-// app.use("/api/stuff", stuffRoutes);
-// app.use("/api/auth", userRoutes);
-// app.use("/images", express.static(path.join(__dirname, "images")));
+app.use("/api/auth", userRoutes);
 
 module.exports = app;
