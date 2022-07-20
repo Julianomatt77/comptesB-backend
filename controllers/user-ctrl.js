@@ -20,7 +20,6 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-	console.log(req.body);
 	User.findOne({ username: req.body.username })
 		.then((user) => {
 			if (user === null) {
@@ -49,11 +48,14 @@ exports.login = (req, res, next) => {
 		});
 };
 
-exports.signout = (req, res) => {
+exports.signout = (req, res, next) => {
 	try {
 		req.session = null;
-		return res.status(200).send({ message: "You've been signed out!" });
+		// console.log(req.session);
+		// console.log(token);
+		// console.log(req);
+		res.status(200).send({ message: "You've been signed out!" });
 	} catch (err) {
-		this.next(err);
+		res.status(500).json({ err });
 	}
 };
