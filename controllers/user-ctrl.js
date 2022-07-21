@@ -23,9 +23,9 @@ exports.login = (req, res, next) => {
 	User.findOne({ username: req.body.username })
 		.then((user) => {
 			if (user === null) {
+				console.log("ici");
 				res.status(400).json({ message: "Invalid credentials" });
 			} else {
-				console.log(req.body.password, user.password);
 				bcrypt
 					.compare(req.body.password, user.password)
 					.then((valid) => {
@@ -33,6 +33,7 @@ exports.login = (req, res, next) => {
 							res.status(400).json({ message: "Invalid credentials" });
 						} else {
 							res.status(200).json({
+								username: user.username,
 								userId: user._id,
 								token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", { expiresIn: "24h" }),
 							});

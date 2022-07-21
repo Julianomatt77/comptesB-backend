@@ -13,9 +13,9 @@ exports.createOperation = (req, res, next) => {
 		description2: req.body._description2,
 		operationDate: req.body._operationDate,
 		solde: req.body._solde,
-		...req.body,
+		userId: req.auth.userId,
+		// ...req.body,
 		// ...req.query,
-		userId: 1,
 	});
 	// console.log("operation", operation);
 	operation
@@ -37,7 +37,7 @@ exports.updateOneOperation = (req, res, next) => {
 		{
 			...req.body.operation,
 			_id: req.params.id,
-			userId: 1,
+			userId: req.auth.userId,
 		}
 	)
 		.then(() => res.status(200).json({ message: "Operation modifié!" }))
