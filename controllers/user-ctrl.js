@@ -23,7 +23,6 @@ exports.login = (req, res, next) => {
 	User.findOne({ username: req.body.username })
 		.then((user) => {
 			if (user === null) {
-				console.log("ici");
 				res.status(400).json({ message: "Invalid credentials" });
 			} else {
 				bcrypt
@@ -52,9 +51,6 @@ exports.login = (req, res, next) => {
 exports.signout = (req, res, next) => {
 	try {
 		req.session = null;
-		// console.log(req.session);
-		// console.log(token);
-		// console.log(req);
 		res.status(200).send({ message: "You've been signed out!" });
 	} catch (err) {
 		res.status(500).json({ err });

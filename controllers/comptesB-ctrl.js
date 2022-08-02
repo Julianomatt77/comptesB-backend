@@ -2,8 +2,6 @@ const Compte = require("../models/Compte");
 // const fs = require("fs");
 
 exports.createAccount = (req, res, next) => {
-	// console.log(req.auth);
-	console.log(req.body);
 	delete req.body._id;
 	// delete req.body.userId;
 	const compte = new Compte({
@@ -57,8 +55,6 @@ exports.deleteAccount = (req, res, next) => {
 exports.updateSolde = (req, res, next) => {
 	Compte.findOne({ name: req.params.name })
 		.then((compte) => {
-			// console.log(compte);
-			// console.log(req.body);
 			Compte.updateOne(
 				{ _id: compte._id },
 				{
@@ -71,11 +67,9 @@ exports.updateSolde = (req, res, next) => {
 				}
 			)
 				.then(() => {
-					// console.log(compte);
 					res.status(200).json({ message: "Compte modifié!" });
 				})
 				.catch((error) => {
-					console.log(req.body);
 					res.status(401).json({ error });
 				});
 		})

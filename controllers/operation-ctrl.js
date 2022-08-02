@@ -17,7 +17,6 @@ exports.createOperation = (req, res, next) => {
 		// ...req.body,
 		// ...req.query,
 	});
-	// console.log("operation", operation);
 	operation
 		.save()
 		.then(() => res.status(201).json({ message: "Operation enregistré !" }))
@@ -31,7 +30,6 @@ exports.getOneOperation = (req, res, then) => {
 };
 
 exports.updateOneOperation = (req, res, next) => {
-	// console.log("update", req.body);
 	Operation.updateOne(
 		{ _id: req.params.id },
 		{
@@ -45,12 +43,37 @@ exports.updateOneOperation = (req, res, next) => {
 };
 
 exports.getAllOperations = (req, res, next) => {
-	var sortByDate = { operationDate: -1 };
+	let sortByDate = { operationDate: -1 };
 	Operation.find()
 		.sort(sortByDate)
 		.then((operations) => res.status(200).json(operations))
 		.catch((error) => res.status(400).json({ error }));
 	// res.status(200).json({ message: "ok" });
+};
+
+exports.getOperationsFiltered = (req, res, next) => {
+	let sortByDate = { operationDate: -1 };
+
+	let month = req.body.month;
+	let year = req.body.year;
+
+	let startDate = new Date();
+	let endDate = new Date();
+
+	if (month) {
+		startDate = new Date(year, month - 1, 01);
+		endDate = new Date(year, month - 1, 31);
+	} else {
+		startDate = new Date(year, 00, 01);
+		endDate = new Date(year, 11, 31);
+	}
+
+	Operation.find({
+		operationDate: { $gte: startDate, $lte: endDate },
+	})
+		.sort(sortByDate)
+		.then((operations) => res.status(200).json(operations))
+		.catch((error) => res.status(400).json({ error }));
 };
 
 exports.deleteOperation = (req, res, next) => {

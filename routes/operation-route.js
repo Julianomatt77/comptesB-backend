@@ -5,6 +5,7 @@ const router = express.Router();
 const operationCtrl = require("../controllers/operation-ctrl");
 
 router.get("/getAllOperations", auth, operationCtrl.getAllOperations);
+router.post("/getOperationsFiltered", auth, operationCtrl.getOperationsFiltered);
 router.post("/createOperation", auth, operationCtrl.createOperation);
 router.get("/getOneOperation/:id", auth, operationCtrl.getOneOperation);
 router.post("/updateOneOperation/:id", auth, operationCtrl.updateOneOperation);
