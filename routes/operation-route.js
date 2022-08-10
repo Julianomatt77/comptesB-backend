@@ -10,6 +10,7 @@ router.post("/createOperation", auth, operationCtrl.createOperation);
 
 router.post("/uploadAccountHistory", auth, operationCtrl.uploadAccountHistory);
 router.get("/getAccountHistory", auth, operationCtrl.getAccountHistory);
+router.get("/getEpargneHistory", auth, operationCtrl.getEpargneHistory);
 
 router.get("/getOneOperation/:id", auth, operationCtrl.getOneOperation);
 router.post("/updateOneOperation/:id", auth, operationCtrl.updateOneOperation);
