@@ -1,5 +1,5 @@
 const Operation = require("../models/Operation");
-// const fs = require("fs");
+const fs = require("fs");
 
 exports.createOperation = (req, res, next) => {
 	delete req.body._id;
@@ -80,4 +80,43 @@ exports.deleteOperation = (req, res, next) => {
 	Operation.deleteOne({ _id: req.params.id })
 		.then(() => res.status(200).json({ message: "Operation supprimé !" }))
 		.catch((error) => res.status(400).json({ error }));
+};
+
+exports.uploadAccountHistory = (req, res, next) => {
+	try {
+		let userId = req.auth.userId;
+		// let userId = "62d7cd8a12c0b6bc1e830206";
+		let uploadPath = "uploads/accountHistory/user_" + userId + "/";
+		let filename = "accountHistory_" + userId + ".json";
+		let data = req.body;
+
+		//Creation of the folder "configurations" if it does not exist
+		if (!fs.existsSync(uploadPath)) {
+			fs.mkdirSync(uploadPath, { recursive: true });
+		}
+
+		//Save file
+		fs.writeFile(uploadPath + filename, JSON.stringify(data), function (err) {});
+
+		res.status(200).json({ message: "Historique enregistré !" });
+	} catch (err) {
+		return res.status(400).json({ message: "error writing file back-end : " + err });
+	}
+};
+
+exports.getAccountHistory = (req, res, next) => {
+	try {
+		let userId = req.auth.userId;
+		let uploadPath = "uploads/accountHistory/user_" + userId + "/";
+		let filename = "accountHistory_" + userId + ".json";
+		let fullFilePath = uploadPath + filename;
+		// if (fs.existsSync(fullFilePath)) {
+		let historique = JSON.parse(fs.readFileSync(fullFilePath));
+		// console.log(Array.isArray(historique));
+		// console.log(typeof historique);
+		// }
+		res.status(200).json(historique);
+	} catch (err) {
+		return res.status(400).json({ message: "error writing file back-end : " + err });
+	}
 };
