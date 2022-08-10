@@ -85,10 +85,17 @@ exports.deleteOperation = (req, res, next) => {
 exports.uploadAccountHistory = (req, res, next) => {
 	try {
 		let userId = req.auth.userId;
-		// let userId = "62d7cd8a12c0b6bc1e830206";
-		let uploadPath = "uploads/accountHistory/user_" + userId + "/";
-		let filename = "accountHistory_" + userId + ".json";
-		let data = req.body;
+		let data = req.body.soldeAllArray;
+		let uploadPath = "";
+		let filename = "";
+
+		if (req.body.type == "Compte Courant") {
+			uploadPath = "uploads/account_History/";
+			filename = "accountHistory_" + userId + ".json";
+		} else {
+			uploadPath = "uploads/epargne_History/";
+			filename = "epargneHistory_" + userId + ".json";
+		}
 
 		//Creation of the folder "configurations" if it does not exist
 		if (!fs.existsSync(uploadPath)) {
@@ -107,8 +114,24 @@ exports.uploadAccountHistory = (req, res, next) => {
 exports.getAccountHistory = (req, res, next) => {
 	try {
 		let userId = req.auth.userId;
-		let uploadPath = "uploads/accountHistory/user_" + userId + "/";
+		let uploadPath = "uploads/account_History/";
 		let filename = "accountHistory_" + userId + ".json";
+		let fullFilePath = uploadPath + filename;
+		// if (fs.existsSync(fullFilePath)) {
+		let historique = JSON.parse(fs.readFileSync(fullFilePath));
+		// console.log(Array.isArray(historique));
+		// console.log(typeof historique);
+		// }
+		res.status(200).json(historique);
+	} catch (err) {
+		return res.status(400).json({ message: "error writing file back-end : " + err });
+	}
+};
+exports.getEpargneHistory = (req, res, next) => {
+	try {
+		let userId = req.auth.userId;
+		let uploadPath = "uploads/epargne_History/";
+		let filename = "epargneHistory_" + userId + ".json";
 		let fullFilePath = uploadPath + filename;
 		// if (fs.existsSync(fullFilePath)) {
 		let historique = JSON.parse(fs.readFileSync(fullFilePath));
