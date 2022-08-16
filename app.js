@@ -7,6 +7,7 @@ var cors = require("cors");
 
 const comptesRoutes = require("./routes/comptesB-route");
 const operationsRoutes = require("./routes/operation-route");
+const opCommuneRoutes = require("./routes/opCommune-route");
 const userRoutes = require("./routes/user-route");
 
 app.use(express.json());
@@ -30,6 +31,7 @@ app.options("*", cors());
 
 app.use("/api/comptes", comptesRoutes);
 app.use("/api/operations", operationsRoutes);
+app.use("/api/opCommunes", opCommuneRoutes);
 app.use("/api/auth", userRoutes);
 
 module.exports = app;
