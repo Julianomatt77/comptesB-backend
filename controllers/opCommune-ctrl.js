@@ -79,8 +79,6 @@ exports.deleteOperation = (req, res, next) => {
 
 /**********************   USERS ******************************* */
 exports.createUser = (req, res, next) => {
-	console.log(req.body);
-	console.log("ici");
 	delete req.body._id;
 	const opCommuneUser = new OpCommuneUser({
 		name: req.body._name,
@@ -105,10 +103,12 @@ exports.getOneUserByName = (req, res, then) => {
 };
 
 exports.updateOneUser = (req, res, next) => {
+	console.log(req.body.user);
 	OpCommuneUser.updateOne(
 		{ _id: req.params.id },
 		{
 			...req.body.user,
+			history: req.body.user._history,
 			_id: req.params.id,
 			userId: req.auth.userId,
 		}
