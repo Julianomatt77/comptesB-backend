@@ -56,3 +56,46 @@ exports.signout = (req, res, next) => {
 		res.status(500).json({ err });
 	}
 };
+
+exports.getOneUser = (req, res, then) => {
+	User.findOne({ _id: req.params.id })
+		.then((user) => res.status(200).json(user))
+		.catch((error) => res.status(400).json({ error }));
+};
+
+exports.deleteUser = (req, res, next) => {
+	User.deleteOne({ _id: req.params.id })
+		.then(() => res.status(200).json({ message: "Utilisateur supprimé !" }))
+		.catch((error) => res.status(400).json({ error }));
+};
+
+exports.updateOneUser = (req, res, next) => {
+	console.log(req.body);
+
+	if (req.body.user.password != undefined || req.body.user.password != null) {
+		bcrypt.hash(req.body.user.password, 10).then((hash) => {
+			User.updateOne(
+				{ _id: req.params.id },
+				{
+					_id: req.params.id,
+					username: req.body.user.username,
+					email: req.body.user.email,
+					password: hash,
+				}
+			)
+				.then(() => res.status(200).json({ message: "Utilisateur modifié!" }))
+				.catch((error) => res.status(401).json({ error }));
+		});
+	} else {
+		User.updateOne(
+			{ _id: req.params.id },
+			{
+				_id: req.params.id,
+				username: req.body.user.username,
+				email: req.body.user.email,
+			}
+		)
+			.then(() => res.status(200).json({ message: "Utilisateur modifié!" }))
+			.catch((error) => res.status(401).json({ error }));
+	}
+};

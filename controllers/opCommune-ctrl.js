@@ -103,7 +103,7 @@ exports.getOneUserByName = (req, res, then) => {
 };
 
 exports.updateOneUser = (req, res, next) => {
-	console.log(req.body.user);
+	// console.log(req.body.user);
 	OpCommuneUser.updateOne(
 		{ _id: req.params.id },
 		{
