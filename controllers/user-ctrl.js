@@ -70,8 +70,6 @@ exports.deleteUser = (req, res, next) => {
 };
 
 exports.updateOneUser = (req, res, next) => {
-	console.log(req.body);
-
 	if (req.body.user.password != undefined || req.body.user.password != null) {
 		bcrypt.hash(req.body.user.password, 10).then((hash) => {
 			User.updateOne(
