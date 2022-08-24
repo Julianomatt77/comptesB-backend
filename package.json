@@ -13,7 +13,7 @@
 		"zone.js": "~0.11.4"
 	},
 	"scripts": {
-		"start": "node server.js",
+		"start": "node server.js --ignore '*.json'",
 		"dev": "nodemon server.js --ignore '*.json'"
 	},
 	"name": "comptesb-backend",
