@@ -2,7 +2,8 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
-const dbConfig = require("./config/database.config.js");
+const dbConfig = process.env["dbConfig"];
+// const url = process.env["url"];
 var cors = require("cors");
 
 const comptesRoutes = require("./routes/comptesB-route");
@@ -13,7 +14,7 @@ const userRoutes = require("./routes/user-route");
 app.use(express.json());
 
 mongoose
-	.connect(dbConfig.url, {
+	.connect(dbConfig, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	})
