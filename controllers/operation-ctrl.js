@@ -35,7 +35,7 @@ exports.updateOneOperation = (req, res, next) => {
 		{
 			...req.body.operation,
 			_id: req.params.id,
-			userId: req.auth.userId,
+			// userId: req.auth.userId,
 		}
 	)
 		.then(() => res.status(200).json({ message: "Operation modifié!" }))
