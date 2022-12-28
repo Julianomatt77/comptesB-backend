@@ -29,10 +29,10 @@ exports.updateOneAccount = (req, res, next) => {
 	Compte.updateOne(
 		{ _id: req.params.id },
 		{
-			...req.body.compte,
-			_id: req.params.id,
-			userId: req.auth.userId,
-			// userId: 1,
+			name: req.body.compte.name,
+			typeCompte: req.body.compte.typeCompte,
+			soldeInitial: req.body.compte.soldeInitial,
+			soldeActuel: req.body.compte.soldeActuel
 		}
 	)
 		.then(() => res.status(200).json({ message: "Compte modifié!" }))
@@ -62,7 +62,7 @@ exports.updateSolde = (req, res, next) => {
 					name: compte.name,
 					typeCompte: compte.typeCompte,
 					soldeInitial: compte.soldeInitial,
-					userId: compte.userId,
+					// userId: compte.userId,
 					soldeActuel: req.body.solde,
 				}
 			)
@@ -77,7 +77,7 @@ exports.updateSolde = (req, res, next) => {
 };
 
 exports.getOneAccountByName = (req, res, then) => {
-	Compte.findOne({ name: req.params.name })
+	Compte.findOne({ name: req.params.name , userId: req.params.userId})
 		.then((compte) => res.status(200).json(compte))
 		.catch((error) => res.status(400).json({ error }));
 };
