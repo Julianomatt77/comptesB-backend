@@ -1,5 +1,6 @@
 const Operation = require("../models/Operation");
 const fs = require("fs");
+const Compte = require("../models/Compte");
 
 exports.createOperation = (req, res, next) => {
 	delete req.body._id;
@@ -25,7 +26,23 @@ exports.createOperation = (req, res, next) => {
 
 exports.getOneOperation = (req, res, then) => {
 	Operation.findOne({ _id: req.params.id })
-		.then((operation) => res.status(200).json(operation))
+		.then((operation) => {
+			if (!operation) {
+				return res.status(404).json({ message: 'Opération non trouvée' });
+			}
+
+			Promise.all([
+				Compte.findOne({ _id: operation.compte }),
+			])
+				.then(([compte]) => {
+					if (compte) {
+						operation.compteName = compte.name;
+						operation.compteType = compte.typeCompte;
+					}
+					res.status(200).json(operation);
+				})
+				.catch((error) => res.status(400).json({ error }));
+		})
 		.catch((error) => res.status(400).json({ error }));
 };
 
@@ -46,9 +63,24 @@ exports.getAllOperations = (req, res, next) => {
 	let sortByDate = { operationDate: -1 };
 	Operation.find()
 		.sort(sortByDate)
-		.then((operations) => res.status(200).json(operations))
+		.then((operations) => {
+			const promises = operations.map((operation) => {
+				return Compte.findOne({_id: operation.compte})
+					.then((compte) => {
+						operation.compteName = compte.name;
+						operation.compteType = compte.typeCompte;
+						return operation;
+					})
+					.catch((error) => {
+						throw error;
+					});
+			});
+			return Promise.all(promises);
+		})
+		.then((operationsWithCompteInfo) => {
+			res.status(200).json(operationsWithCompteInfo);
+		})
 		.catch((error) => res.status(400).json({ error }));
-	// res.status(200).json({ message: "ok" });
 };
 
 exports.getOperationsFiltered = (req, res, next) => {
@@ -59,21 +91,37 @@ exports.getOperationsFiltered = (req, res, next) => {
 
 	let startDate = new Date();
 	let endDate = new Date();
-
 	if (month) {
-		startDate = new Date(year, month - 1, 01);
-		endDate = new Date(year, month - 1, 31);
+		startDate = new Date(year, month - 1, 1);
+		endDate = new Date(year, month, 1);
 	} else {
-		startDate = new Date(year, 00, 01);
+		startDate = new Date(year, 0, 1);
 		endDate = new Date(year, 11, 31);
 	}
 
 	Operation.find({
-		operationDate: { $gte: startDate, $lte: endDate },
+		operationDate: {$gte: startDate, $lte: endDate},
 	})
 		.sort(sortByDate)
-		.then((operations) => res.status(200).json(operations))
-		.catch((error) => res.status(400).json({ error }));
+		.then((operations) => {
+			const promises = operations.map((operation) => {
+				return Compte.findOne({_id: operation.compte})
+					.then((compte) => {
+						operation.compteName = compte.name;
+						operation.compteType = compte.typeCompte;
+						return operation;
+					})
+					.catch((error) => {
+						throw error;
+					});
+			});
+
+			return Promise.all(promises);
+		})
+		.then((operationsWithCompteInfo) => {
+			res.status(200).json(operationsWithCompteInfo);
+		})
+		.catch((error) => res.status(400).json({error}));
 };
 
 exports.deleteOperation = (req, res, next) => {
