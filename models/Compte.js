@@ -6,6 +6,7 @@ const compteSchema = mongoose.Schema({
 	typeCompte: { type: String, required: true },
 	soldeInitial: { type: Number, required: true },
 	soldeActuel: { type: Number, required: true },
+	history: { type: Array, required: false },
 });
 
 module.exports = mongoose.model("Compte", compteSchema);
