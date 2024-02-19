@@ -61,9 +61,10 @@ exports.updateOneOperation = (req, res, next) => {
 
 exports.getAllOperations = (req, res, next) => {
 	let sortByDate = { operationDate: -1 };
-	Operation.find()
+	Operation.find({userId: req.auth.userId})
 		.sort(sortByDate)
 		.then((operations) => {
+			//TODO récup tous les comptes et chercher dans array à la place?
 			const promises = operations.map((operation) => {
 				return Compte.findOne({_id: operation.compte})
 					.then((compte) => {
@@ -80,7 +81,10 @@ exports.getAllOperations = (req, res, next) => {
 		.then((operationsWithCompteInfo) => {
 			res.status(200).json(operationsWithCompteInfo);
 		})
-		.catch((error) => res.status(400).json({ error }));
+		.catch((error) => {
+			console.log(error)
+			res.status(400).json({ error })
+		});
 };
 
 exports.getOperationsFiltered = (req, res, next) => {
@@ -100,6 +104,7 @@ exports.getOperationsFiltered = (req, res, next) => {
 	}
 
 	Operation.find({
+		userId: req.auth.userId,
 		operationDate: {$gte: startDate, $lte: endDate},
 	})
 		.sort(sortByDate)

@@ -28,7 +28,7 @@ exports.getOneAccount = (req, res, then) => {
 				return res.status(404).json({ message: 'Compte non trouvé' });
 			}
 
-			return getAccountHistory().then((accountsHistory) => {
+			return getAccountHistory(compte).then((accountsHistory) => {
 				updateSoldeInitial(compte, accountsHistory);
 				res.status(200).json(compte);
 			});
@@ -53,15 +53,17 @@ exports.updateOneAccount = (req, res, next) => {
 exports.getAllAccounts = (req, res, next) => {
 	Compte.find()
 		.then((comptes) => {
-			return getAccountHistory().then((accountsHistory) => {
+			return getAccountHistory(comptes).then((accountsHistory) => {
 				comptes.forEach((compte) => {
 					updateSoldeInitial(compte, accountsHistory);
-					// console.log(compte)
 				});
 				res.status(200).json(comptes);
 			});
 		})
-		.catch((error) => res.status(400).json({ error }));
+		.catch((error) => {
+			console.log(error)
+			res.status(400).json({ error })
+		});
 };
 
 exports.deleteAccount = (req, res, next) => {
@@ -97,7 +99,7 @@ exports.updateSolde = (req, res, next) => {
 exports.getOneAccountByName = (req, res, then) => {
 	Compte.findOne({ name: req.params.name , userId: req.params.userId})
 		.then((compte) => {
-			return getAccountHistory().then((accountsHistory) => {
+			return getAccountHistory(compte).then((accountsHistory) => {
 				updateSoldeInitial(compte, accountsHistory);
 				res.status(200).json(compte);
 			});
@@ -105,7 +107,7 @@ exports.getOneAccountByName = (req, res, then) => {
 		.catch((error) => res.status(400).json({ error }));
 };
 
-function getAccountHistory() {
+function getAccountHistory(comptes) {
 	let currentYear = new Date(Date.now()).getFullYear();
 	let operationsYears = []
 	let sortByDate = { operationDate: 1 };
@@ -114,15 +116,16 @@ function getAccountHistory() {
 		.sort(sortByDate)
 		.then((operations) => {
 			const promises = operations.map((operation) => {
-				return Compte.findOne({ _id: operation.compte })
-					.then((compte) => {
-						operation.compteName = compte.name;
-						operation.compteType = compte.typeCompte;
-						return operation;
-					})
-					.catch((error) => {
-						throw error;
-					});
+				if (Array.isArray(comptes)){
+					let indexTrouve = comptes.findIndex((compte) => operation.compte === compte.id);
+					operation.compteName = comptes[indexTrouve].name
+					operation.compteType = comptes[indexTrouve].typeCompte
+				} else {
+					let indexTrouve = comptes
+					operation.compteName = comptes.name
+					operation.compteType = comptes.typeCompte
+				}
+				return operation
 			});
 
 			return Promise.all(promises);
@@ -199,6 +202,9 @@ function getAccountHistory() {
 			});
 
 			return accountsHistory;
+		})
+		.catch((error) => {
+			console.log(error)
 		});
 }
 
