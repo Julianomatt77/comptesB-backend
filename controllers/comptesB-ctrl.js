@@ -1,5 +1,7 @@
 const Compte = require("../models/Compte");
+const Operation = require("../models/Operation");
 // const fs = require("fs");
+let operationsYears = [];
 
 exports.createAccount = (req, res, next) => {
 	delete req.body._id;
@@ -21,7 +23,16 @@ exports.createAccount = (req, res, next) => {
 
 exports.getOneAccount = (req, res, then) => {
 	Compte.findOne({ _id: req.params.id })
-		.then((compte) => res.status(200).json(compte))
+		.then((compte) => {
+			if (!compte) {
+				return res.status(404).json({ message: 'Compte non trouvé' });
+			}
+
+			return getAccountHistory().then((accountsHistory) => {
+				updateSoldeInitial(compte, accountsHistory);
+				res.status(200).json(compte);
+			});
+		})
 		.catch((error) => res.status(400).json({ error }));
 };
 
@@ -41,9 +52,16 @@ exports.updateOneAccount = (req, res, next) => {
 
 exports.getAllAccounts = (req, res, next) => {
 	Compte.find()
-		.then((comptes) => res.status(200).json(comptes))
+		.then((comptes) => {
+			return getAccountHistory().then((accountsHistory) => {
+				comptes.forEach((compte) => {
+					updateSoldeInitial(compte, accountsHistory);
+					// console.log(compte)
+				});
+				res.status(200).json(comptes);
+			});
+		})
 		.catch((error) => res.status(400).json({ error }));
-	// res.status(200).json({ message: "ok" });
 };
 
 exports.deleteAccount = (req, res, next) => {
@@ -78,6 +96,130 @@ exports.updateSolde = (req, res, next) => {
 
 exports.getOneAccountByName = (req, res, then) => {
 	Compte.findOne({ name: req.params.name , userId: req.params.userId})
-		.then((compte) => res.status(200).json(compte))
+		.then((compte) => {
+			return getAccountHistory().then((accountsHistory) => {
+				updateSoldeInitial(compte, accountsHistory);
+				res.status(200).json(compte);
+			});
+		})
 		.catch((error) => res.status(400).json({ error }));
 };
+
+function getAccountHistory() {
+	let currentYear = new Date(Date.now()).getFullYear();
+	let operationsYears = []
+	let sortByDate = { operationDate: 1 };
+
+	return Operation.find()
+		.sort(sortByDate)
+		.then((operations) => {
+			const promises = operations.map((operation) => {
+				return Compte.findOne({ _id: operation.compte })
+					.then((compte) => {
+						operation.compteName = compte.name;
+						operation.compteType = compte.typeCompte;
+						return operation;
+					})
+					.catch((error) => {
+						throw error;
+					});
+			});
+
+			return Promise.all(promises);
+		})
+		.then((operationsWithCompteInfo) => {
+			// Extraire les années de operationDate
+			const operationYears = operationsWithCompteInfo.map((operation) => {
+				return new Date(operation.operationDate).getFullYear();
+			});
+			const firstYear = operationYears.reduce((max, year) => Math.min(max, year));
+			for (let i = 0; i <= currentYear - firstYear; i++) {
+				operationsYears.unshift(currentYear - i);
+			}
+
+			const accountsHistory = {};
+			// Créer l'objet history pour chaque compte
+			operationsWithCompteInfo.forEach((operation) => {
+				const compteId = operation.compte;
+				let totalDebit = 0;
+				let totalCredit = 0;
+
+				if (!accountsHistory[compteId]) {
+					accountsHistory[compteId] = {
+						history: [],
+					};
+				}
+
+				for (let year = firstYear; year <= currentYear; year++) {
+					for (let month = 1; month <= 12; month++) {
+						const operationDateKey = `${year}-${month < 10 ? '0' : ''}${month}`;
+
+						// Vérifier si l'année existe dans l'historique du compte
+						const entryIndex = accountsHistory[compteId].history.findIndex((entry) => entry.dateSolde === operationDateKey);
+
+						// Si l'année n'existe pas, ajouter une nouvelle entrée
+						if (entryIndex === -1) {
+							accountsHistory[compteId].history.push({
+								dateSolde: operationDateKey,
+								soldeInitial: 0,
+								soldeFinal: 0,
+								montant: 0,
+								totalCredit: 0,
+								totalDebit: 0,
+							});
+
+							// Triez l'historique par dateSolde
+							accountsHistory[compteId].history.sort((a, b) => a.dateSolde.localeCompare(b.dateSolde));
+						}
+					}
+				}
+
+				// Extraire l'année et le mois de operationDate
+				const operationYear = new Date(operation.operationDate).getFullYear();
+				const operationMonth = new Date(operation.operationDate).getMonth() + 1;
+				const entryIndex = accountsHistory[compteId].history.findIndex(
+					(entry) =>
+						entry.dateSolde ===
+						`${operationYear}-${operationMonth < 10 ? '0' : ''}${operationMonth}`
+				);
+
+				if (operation.type){
+					totalCredit += operation.montant
+					let temp = Math.round(totalCredit * 100) / 100;
+					totalCredit = temp;
+				} else {
+					totalDebit += (-operation.montant)
+					let temp = Math.round(totalDebit * 100) / 100;
+					totalDebit = temp;
+				}
+
+				accountsHistory[compteId].history[entryIndex].montant += operation.montant;
+				accountsHistory[compteId].history[entryIndex].totalCredit += totalCredit;
+				accountsHistory[compteId].history[entryIndex].totalDebit += totalDebit;
+			});
+
+			return accountsHistory;
+		});
+}
+
+function updateSoldeInitial(compte, accountsHistory) {
+	const accountHistory = accountsHistory[compte.id] ? accountsHistory[compte.id].history : [];
+
+	if (accountHistory.length > 0) {
+		compte.history = accountHistory;
+
+		// Mettre à jour le solde initial pour chaque entrée de l'historique
+		compte.history.forEach((entry, index) => {
+			if (index > 0) {
+				entry.soldeInitial = compte.history[index - 1].soldeFinal;
+			} else {
+				// Pour la première entrée, utiliser le solde initial du compte
+				entry.soldeInitial = compte.soldeInitial;
+			}
+
+			entry.soldeFinal = entry.soldeInitial + entry.montant;
+		});
+	} else {
+		compte.history = [];
+	}
+}
