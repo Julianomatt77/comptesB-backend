@@ -28,7 +28,7 @@ exports.getOneAccount = (req, res, then) => {
 				return res.status(404).json({ message: 'Compte non trouvé' });
 			}
 
-			return getAccountHistory().then((accountsHistory) => {
+			return getAccountHistory(compte).then((accountsHistory) => {
 				updateSoldeInitial(compte, accountsHistory);
 				res.status(200).json(compte);
 			});
@@ -116,9 +116,15 @@ function getAccountHistory(comptes) {
 		.sort(sortByDate)
 		.then((operations) => {
 			const promises = operations.map((operation) => {
-				let indexTrouve = comptes.findIndex((compte) => operation.compte === compte.id);
-				operation.compteName = comptes[indexTrouve].name
-				operation.compteType = comptes[indexTrouve].typeCompte
+				if (Array.isArray(comptes)){
+					let indexTrouve = comptes.findIndex((compte) => operation.compte === compte.id);
+					operation.compteName = comptes[indexTrouve].name
+					operation.compteType = comptes[indexTrouve].typeCompte
+				} else {
+					let indexTrouve = comptes
+					operation.compteName = comptes.name
+					operation.compteType = comptes.typeCompte
+				}
 				return operation
 			});
 
