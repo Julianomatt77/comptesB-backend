@@ -5,6 +5,8 @@ const operationSchema = mongoose.Schema({
 	type: { type: Boolean, required: true },
 	categorie: { type: String, required: true },
 	compte: { type: String, required: true },
+	compteName: { type: String, required: false },
+	compteType: { type: String, required: false },
 	description1: { type: String, required: true },
 	description2: { type: String, required: false },
 	userId: { type: String, required: true },
