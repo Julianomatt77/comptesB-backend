@@ -64,6 +64,7 @@ exports.getAllOperations = (req, res, next) => {
 	Operation.find({userId: req.auth.userId})
 		.sort(sortByDate)
 		.then((operations) => {
+			//TODO récup tous les comptes et chercher dans array à la place?
 			const promises = operations.map((operation) => {
 				return Compte.findOne({_id: operation.compte})
 					.then((compte) => {
