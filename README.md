@@ -14,3 +14,5 @@ API (Node.js / Express / MongoDb) de l'Application web de gestion de comptes ban
 `node server.js` en prod.
 
 `node --watch server.js` en dev
+
+`fly deploy` pour mettre en prod
