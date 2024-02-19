@@ -110,7 +110,7 @@ function getAccountHistory() {
 	let operationsYears = []
 	let sortByDate = { operationDate: 1 };
 
-	return Operation.find()
+	return Operation.find({userId: req.auth.userId})
 		.sort(sortByDate)
 		.then((operations) => {
 			const promises = operations.map((operation) => {
