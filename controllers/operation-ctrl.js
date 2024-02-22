@@ -61,29 +61,32 @@ exports.updateOneOperation = (req, res, next) => {
 
 exports.getAllOperations = (req, res, next) => {
 	let sortByDate = { operationDate: -1 };
-	Operation.find({userId: req.auth.userId})
-		.sort(sortByDate)
-		.then((operations) => {
-			//TODO récup tous les comptes et chercher dans array à la place?
-			const promises = operations.map((operation) => {
-				return Compte.findOne({_id: operation.compte})
-					.then((compte) => {
-						operation.compteName = compte.name;
-						operation.compteType = compte.typeCompte;
+
+	// Récupérer tous les comptes
+	Compte.find({ userId: req.auth.userId })
+		.then((comptes) => {
+			const compteMap = new Map(comptes.map(compte => [compte._id.toString(), compte]));
+
+			// Récupérer toutes les opérations
+			return Operation.find({ userId: req.auth.userId })
+				.sort(sortByDate)
+				.then((operations) => {
+					// Mettre à jour les opérations avec les informations des comptes
+					const operationsWithCompteInfo = operations.map((operation) => {
+						const compte = compteMap.get(operation.compte.toString());
+						if (compte) {
+							operation.compteName = compte.name;
+							operation.compteType = compte.typeCompte;
+						}
 						return operation;
-					})
-					.catch((error) => {
-						throw error;
 					});
-			});
-			return Promise.all(promises);
-		})
-		.then((operationsWithCompteInfo) => {
-			res.status(200).json(operationsWithCompteInfo);
+
+					res.status(200).json(operationsWithCompteInfo);
+				});
 		})
 		.catch((error) => {
-			console.log(error)
-			res.status(400).json({ error })
+			console.log(error);
+			res.status(400).json({ error });
 		});
 };
 
