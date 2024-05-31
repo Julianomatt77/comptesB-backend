@@ -63,7 +63,7 @@ exports.getAllOperations = (req, res, next) => {
 	let sortByDate = { operationDate: -1 };
 
 	// Récupérer tous les comptes
-	Compte.find({ userId: req.auth.userId })
+	Compte.find({ userId: req.auth.userId})
 		.then((comptes) => {
 			const compteMap = new Map(comptes.map(compte => [compte._id.toString(), compte]));
 
@@ -72,14 +72,17 @@ exports.getAllOperations = (req, res, next) => {
 				.sort(sortByDate)
 				.then((operations) => {
 					// Mettre à jour les opérations avec les informations des comptes
-					const operationsWithCompteInfo = operations.map((operation) => {
-						const compte = compteMap.get(operation.compte.toString());
-						if (compte) {
-							operation.compteName = compte.name;
-							operation.compteType = compte.typeCompte;
-						}
-						return operation;
-					});
+					const operationsWithCompteInfo = operations
+						.map((operation) => {
+							const compte = compteMap.get(operation.compte.toString());
+							if (compte && !compte.isDeleted) {
+								operation.compteName = compte.name;
+								operation.compteType = compte.typeCompte;
+								return operation;
+							}
+							return null; // Retourner null si aucun compte n'est trouvé
+						})
+						.filter(operation => operation !== null); // Filtrer les opérations nulles
 
 					res.status(200).json(operationsWithCompteInfo);
 				});
@@ -113,14 +116,18 @@ exports.getOperationsFiltered = (req, res, next) => {
 		.sort(sortByDate)
 		.then((operations) => {
 			const promises = operations.map((operation) => {
-				return Compte.findOne({_id: operation.compte})
+				return Compte.findOne({ _id: operation.compte })
 					.then((compte) => {
-						operation.compteName = compte.name;
-						operation.compteType = compte.typeCompte;
-						return operation;
+						if (compte) {
+							operation.compteName = compte.name;
+							operation.compteType = compte.typeCompte;
+							return operation;
+						}
+						return null; // Retourner null si aucun compte n'est trouvé
 					})
 					.catch((error) => {
-						throw error;
+						console.log(error); // Log the error
+						return null; // Return null in case of an error
 					});
 			});
 
