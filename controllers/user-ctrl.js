@@ -10,6 +10,7 @@ exports.signup = (req, res, next) => {
 				username: req.body.username,
 				email: req.body.email,
 				password: hash,
+				isDeleted: false
 			});
 			user
 				.save()
@@ -24,6 +25,8 @@ exports.login = (req, res, next) => {
 		.then((user) => {
 			if (user === null) {
 				res.status(400).json({ message: "Invalid credentials" });
+			} else if (user.isDeleted) {
+				res.status(400).json({ message: "Ce compte utilisateur a été supprimé" });
 			} else {
 				bcrypt
 					.compare(req.body.password, user.password)
@@ -64,8 +67,10 @@ exports.getOneUser = (req, res, then) => {
 };
 
 exports.deleteUser = (req, res, next) => {
-	User.deleteOne({ _id: req.params.id })
-		.then(() => res.status(200).json({ message: "Utilisateur supprimé !" }))
+	User.updateOne({ _id: req.params.id },
+		{
+			isDeleted: true
+		}).then(() => res.status(200).json({ message: "Utilisateur supprimé !" }))
 		.catch((error) => res.status(400).json({ error }));
 };
 
