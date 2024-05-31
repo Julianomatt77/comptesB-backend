@@ -7,6 +7,7 @@ const compteSchema = mongoose.Schema({
 	soldeInitial: { type: Number, required: true },
 	soldeActuel: { type: Number, required: true },
 	history: { type: Array, required: false },
+	isDeleted: { type: Boolean, required: false },
 });
 
 module.exports = mongoose.model("Compte", compteSchema);
