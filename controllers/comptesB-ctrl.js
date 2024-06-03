@@ -76,7 +76,7 @@ exports.getAllAccounts = (req, res, next) => {
 };
 
 exports.deleteAccount = (req, res, next) => {
-	Compte.updateOne({ _id: req.params.id, userId: req.auth.userId },{
+	Compte.updateOne({ _id: req.body.id, userId: req.auth.userId },{
 		isDeleted: true
 	})
 		.then(() => res.status(200).json({ message: "Compte supprimé !" }))
@@ -117,6 +117,34 @@ exports.getOneAccountByName = (req, res, then) => {
 				res.status(200).json(compte);
 			});
 		})
+		.catch((error) => res.status(400).json({ error }));
+};
+
+exports.getAllDeactivatedAccounts = (req, res, next) => {
+	Compte.find({userId: req.auth.userId})
+		.then((comptes) => {
+			// Filtrer les comptes pour exclure ceux qui ne sont pas actifs
+			const DeactiveComptes = comptes.filter(compte => compte.isDeleted);
+			const userId = req.auth.userId;
+
+			return getAccountHistory(DeactiveComptes, userId).then((accountsHistory) => {
+				DeactiveComptes.forEach((compte) => {
+					updateSoldeInitial(compte, accountsHistory);
+				});
+				res.status(200).json(DeactiveComptes);
+			});
+		})
+		.catch((error) => {
+			console.log(error)
+			res.status(400).json({ error })
+		});
+};
+
+exports.reactivateAccount = (req, res, next) => {
+	Compte.updateOne({ _id: req.body.id, userId: req.auth.userId },{
+		isDeleted: false
+	})
+		.then(() => res.status(200).json({ message: "Compte réactivé !" }))
 		.catch((error) => res.status(400).json({ error }));
 };
 
