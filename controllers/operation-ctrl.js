@@ -118,7 +118,7 @@ exports.getOperationsFiltered = (req, res, next) => {
 			const promises = operations.map((operation) => {
 				return Compte.findOne({ _id: operation.compte })
 					.then((compte) => {
-						if (compte) {
+						if (compte && !compte.isDeleted) {
 							operation.compteName = compte.name;
 							operation.compteType = compte.typeCompte;
 							return operation;
@@ -134,7 +134,8 @@ exports.getOperationsFiltered = (req, res, next) => {
 			return Promise.all(promises);
 		})
 		.then((operationsWithCompteInfo) => {
-			res.status(200).json(operationsWithCompteInfo);
+			const filteredOperations = operationsWithCompteInfo.filter(operation => operation !== null);
+			res.status(200).json(filteredOperations);
 		})
 		.catch((error) => res.status(400).json({error}));
 };
