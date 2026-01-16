@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
-const dbConfig = require("./config/database.config.js"); //Master (db local)
+const dbConfig = require("./config/database.config-prod.js"); //Master (db local)
 // const dbConfig = process.env["dbConfig"]; //prod (secret sur fly.io)
 // const url = process.env["url"];
 var cors = require("cors");
@@ -21,7 +21,7 @@ mongoose
 		useUnifiedTopology: true,
 	})
 	.then(() => console.log("Connexion à MongoDB réussie !"))
-	.catch(() => console.log("Connexion à MongoDB échouée !"));
+	.catch(() => console.log("Connexion à MongoDB échouée !: "));
 
 app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Credentials", true);
@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 	res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
 	next();
 });
-app.options("*", cors());
+app.use(cors());
 
 app.use("/api/comptes", comptesRoutes);
 app.use("/api/operations", operationsRoutes);
