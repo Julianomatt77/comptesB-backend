@@ -24,6 +24,6 @@ API (Node.js / Express / MongoDb) de l'Application web de gestion de comptes ban
 - Passage à Mysql avec l'ORM Prisma: https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/mysql
 - `npx prisma init --datasource-provider mysql --output ../generated/prisma` pour générer les fichiers Prisma
 - `npx prisma migrate dev --name init` pour créer une migration.
-- `npx prisma generate` pour générer le client Prisma
+- `npx prisma generate` pour générer le client Prisma (OBLIGATOIRE APRES npm i)
 - `npx tsx script-test.ts` pour lancer le script de test (ajout d'un utilisateur)
 - `npx prisma studio --config ./prisma.config.ts` pour visualiser la BDD
