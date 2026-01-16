@@ -16,3 +16,8 @@ API (Node.js / Express / MongoDb) de l'Application web de gestion de comptes ban
 `node --watch server.js` en dev
 
 `fly deploy` pour mettre en prod
+
+## Mise à jour v2
+
+- Passage à Mysql avec l'ORM Prisma: https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/mysql
+- 

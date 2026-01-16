@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  username String  @unique
+  password String
+  isDeleted Boolean? @default(false)
+
+  operations Operation[]
+  comptes Compte[]
+  opCommuneUsers OpCommuneUser[]
+  opCommunes OpCommune[]
+}
+
+model Operation {
+  id          Int      @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId      Int
+  montant     Float
+  type        Boolean
+  categorie   String
+  compte      Compte @relation(fields: [compteId], references: [id])
+  compteId    Int
+  compteName  String?
+  compteType  String?
+  description1 String
+  description2 String?
+  operationDate DateTime @default(now())
+  solde         Float
+}
+
+model Compte {
+  id        Int      @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId    Int
+  name      String
+  typeCompte      String
+  soldeInitial     Float
+  soldeActuel     Float
+  // history Array<String> @default([])
+  isDeleted Boolean? @default(false)
+
+  operations Operation[]
+}
+
+model OpCommuneUser {
+  id          Int      @id @default(autoincrement())
+  name String
+  user User @relation(fields: [userId], references: [id])
+  userId    Int
+}
+
+model OpCommune {
+  id          Int      @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId    Int
+  name String
+  montant     Float
+  description String
+  operationDate DateTime @default(now())
+}
