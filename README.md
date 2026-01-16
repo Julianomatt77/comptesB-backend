@@ -27,3 +27,4 @@ API (Node.js / Express / MongoDb) de l'Application web de gestion de comptes ban
 - `npx prisma generate` pour générer le client Prisma (OBLIGATOIRE APRES npm i)
 - `npx tsx script-test.ts` pour lancer le script de test (ajout d'un utilisateur)
 - `npx prisma studio --config ./prisma.config.ts` pour visualiser la BDD
+- `npx tsx prisma/import-mongo.ts` -> script pour importer les anciennes collections MongoDb
