@@ -22,8 +22,6 @@ model User {
 
   operations Operation[]
   comptes Compte[]
-  opCommuneUsers OpCommuneUser[]
-  opCommunes OpCommune[]
 }
 
 model Operation {
@@ -55,21 +53,4 @@ model Compte {
   isDeleted Boolean? @default(false)
 
   operations Operation[]
-}
-
-model OpCommuneUser {
-  id          Int      @id @default(autoincrement())
-  name String
-  user User @relation(fields: [userId], references: [id])
-  userId    Int
-}
-
-model OpCommune {
-  id          Int      @id @default(autoincrement())
-  user User @relation(fields: [userId], references: [id])
-  userId    Int
-  name String
-  montant     Float
-  description String
-  operationDate DateTime @default(now())
 }

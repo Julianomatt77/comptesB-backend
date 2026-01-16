@@ -1,4 +1,4 @@
-# ComptesBBackend
+# Compty API
 
 API (Node.js / Express / MongoDb) de l'Application web de gestion de comptes bancaires.
 
@@ -13,11 +13,17 @@ API (Node.js / Express / MongoDb) de l'Application web de gestion de comptes ban
 
 `node server.js` en prod.
 
-`node --watch server.js` en dev
+`npm run dev` en dev
 
 `fly deploy` pour mettre en prod
 
-## Mise à jour v2
+## Mise à jour v2 (2026)
 
+- mise à jour vers Node 24
+- Suppression de Mongoose et MongoDb
 - Passage à Mysql avec l'ORM Prisma: https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/mysql
-- 
+- `npx prisma init --datasource-provider mysql --output ../generated/prisma` pour générer les fichiers Prisma
+- `npx prisma migrate dev --name init` pour créer une migration.
+- `npx prisma generate` pour générer le client Prisma
+- `npx tsx script-test.ts` pour lancer le script de test (ajout d'un utilisateur)
+- `npx prisma studio --config ./prisma.config.ts` pour visualiser la BDD
