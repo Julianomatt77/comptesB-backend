@@ -2,7 +2,8 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const path = require("path");
-const dbConfig = process.env["dbConfig"];
+const dbConfig = require("./config/database.config.js"); //Master (db local)
+// const dbConfig = process.env["dbConfig"]; //prod (secret sur fly.io)
 // const url = process.env["url"];
 var cors = require("cors");
 
@@ -14,7 +15,8 @@ const userRoutes = require("./routes/user-route");
 app.use(express.json());
 
 mongoose
-	.connect(dbConfig, {
+	// .connect(dbConfig, { //secret sur fly.io
+	.connect(dbConfig.url, { //local
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	})
