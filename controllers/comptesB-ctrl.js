@@ -42,13 +42,24 @@ export const getOneAccount = async (req, res, next) => {
 
 export const updateOneAccount = async (req, res, next) => {
 	try {
-		await prisma.compte.updateMany({
-			where: { id: parseInt(req.params.id), userId: req.auth.userId },
+		const {
+			name,
+			typeCompte,
+			soldeInitial,
+			soldeActuel,
+			isDeleted,
+			userId,
+			history,
+			oldId
+		} = req.body.compte;
+
+		await prisma.compte.update({
+			where: { id: Number(req.params.id), },
 			data: {
-				name: req.body.compte.name,
-				typeCompte: req.body.compte.typeCompte,
-				soldeInitial: req.body.compte.soldeInitial,
-				soldeActuel: req.body.compte.soldeActuel
+				name,
+				typeCompte,
+				soldeInitial: Number(soldeInitial),
+				soldeActuel: Number(soldeActuel),
 			}
 		});
 		res.status(200).json({ message: "Compte modifié!" });

@@ -48,13 +48,33 @@ export const getOneOperation = async (req, res, next) => {
 
 export const updateOneOperation = async (req, res, next) => {
 	try {
-		const opData = { ...req.body.operation };
-		delete opData.id;
-		delete opData.compte;
-		delete opData.userId;
+		const {
+			montant,
+			type,
+			categorie,
+			description1,
+			description2,
+			operationDate,
+			solde,
+			oldId
+		} = req.body.operation;
+
+		const opData = {
+			montant,
+			type,
+			categorie,
+			description1,
+			description2,
+			solde,
+			oldId
+		};
 
 		if (opData.operationDate) opData.operationDate = new Date(opData.operationDate);
-		if (req.body.operation.compte) opData.compteId = parseInt(req.body.operation.compte);
+		if (req.body.operation.compte) {
+			opData.compte = {
+				connect: { id: Number(req.body.operation.compte) }
+			};
+		}
 
 		await prisma.operation.update({
 			where: { id: parseInt(req.params.id) },
