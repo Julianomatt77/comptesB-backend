@@ -4,16 +4,17 @@ export const createAccount = async (req, res, next) => {
 	try {
 		await prisma.compte.create({
 			data: {
-				name: req.body._name,
-				typeCompte: req.body._typeCompte,
-				soldeInitial: req.body._soldeInitial,
-				soldeActuel: req.body._soldeInitial,
+				name: req.body.name,
+				typeCompte: req.body.typeCompte,
+				soldeInitial: req.body.soldeInitial,
+				soldeActuel: req.body.soldeInitial,
 				isDeleted: false,
 				userId: req.auth.userId,
 			}
 		});
 		res.status(201).json({ message: "Compte enregistré !" });
 	} catch (error) {
+		console.error(error);
 		res.status(400).json({ error });
 	}
 };
@@ -210,12 +211,13 @@ async function getAccountHistory(comptes, userId) {
 			const entry = accountsHistory[cId].history.find(e => e.dateSolde === dateKey);
 
 			if (entry) {
+				const montantAbs = Math.abs(operation.montant);
 				if (operation.type) {
-					entry.totalCredit += operation.montant;
+					entry.totalCredit += montantAbs;
 				} else {
-					entry.totalDebit += operation.montant;
+					entry.totalDebit += montantAbs;
 				}
-				entry.montant += (operation.type ? operation.montant : -operation.montant);
+				entry.montant += (operation.type ? montantAbs : -montantAbs);
 			}
 		});
 
