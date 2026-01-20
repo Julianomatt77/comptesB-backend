@@ -307,10 +307,6 @@ export const monthlyRecapByAccount = async (req, res) => {
 	const { year, month } = req.query;
 	const userId = req.auth.userId;
 
-	// const start = new Date(`${year}-${month}-01`);
-	// const end = new Date(start);
-	// end.setMonth(end.getMonth() + 1);
-
 	try {
 		const comptes = await prisma.compte.findMany({
 			where: {
@@ -321,51 +317,6 @@ export const monthlyRecapByAccount = async (req, res) => {
 		});
 
 		const result = await computeMonthlyRecap(userId, comptes, year, month);
-		/*
-		const result = await Promise.all(
-			comptes.map(async compte => {
-				const beforeMonth = await prisma.operation.aggregate({
-					_sum: {montant: true},
-					where: {
-						compteId: compte.id,
-						operationDate: {lt: start}
-					},
-				});
-
-				const monthOps = await prisma.operation.findMany({
-					where: {
-						compteId: compte.id,
-						operationDate: {
-							gte: start,
-							lt: end
-						}
-					}
-				});
-
-				const totalCredit = monthOps
-					.filter(op => op.type === true)
-					.reduce((s, op) => s + op.montant, 0);
-
-				const totalDebit = monthOps
-					.filter(op => op.type === false)
-					.reduce((s, op) => s + Math.abs(op.montant), 0);
-
-				const soldeDebut =
-					compte.soldeInitial + (beforeMonth._sum.montant || 0);
-
-				const soldeFin = soldeDebut + totalCredit - totalDebit;
-
-				return {
-					compteId: compte.id,
-					name: compte.name,
-					soldeDebut,
-					totalCredit,
-					totalDebit,
-					soldeFin
-				};
-			})
-		);
-		 */
 
 		res.status(200).json(result);
 	} catch (error) {
