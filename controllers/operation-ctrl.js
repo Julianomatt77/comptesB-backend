@@ -70,6 +70,7 @@ export const updateOneOperation = async (req, res, next) => {
 			categorie,
 			description1,
 			description2,
+			operationDate,
 			solde,
 			oldId
 		};
