@@ -13,6 +13,11 @@ router.post("/updateSolde/:name", auth, compteCtrl.updateSolde);
 router.post("/updateOneAccount/:id", auth, compteCtrl.updateOneAccount);
 router.post("/deleteAccount/:id", auth, compteCtrl.deleteAccount);
 router.post("/reactivateAccount/:id", auth, compteCtrl.reactivateAccount);
+
+// Récapitulatifs
 router.get('/monthly-recap',auth, compteCtrl.monthlyRecapByAccount);
+router.get('/annual-recap/current-accounts',auth, compteCtrl.annualRecapCurrentAccounts);
+router.get('/annual-recap/savings-accounts',auth, compteCtrl.annualRecapSavingAccounts);
+router.get('/annual-recap/savings-by-account',auth, compteCtrl.annualRecapSavingsByAccounts);
 
 export default router;
