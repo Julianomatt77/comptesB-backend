@@ -286,8 +286,7 @@ export const monthlyRecapByAccount = async (req, res) => {
 						operationDate: {
 							gte: start,
 							lt: end
-						},
-						categorie: {not: 'Transfert'}
+						}
 					}
 				});
 
