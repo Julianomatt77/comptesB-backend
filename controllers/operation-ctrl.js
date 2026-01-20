@@ -5,19 +5,24 @@ export const createOperation = async (req, res, next) => {
 	try {
 		await prisma.operation.create({
 			data: {
-				montant: req.body._montant,
-				type: req.body._type,
-				categorie: req.body._categorie,
-				compteId: parseInt(req.body._compte),
-				description1: req.body._description1,
-				description2: req.body._description2,
-				operationDate: new Date(req.body._operationDate),
-				solde: req.body._solde,
-				userId: req.auth.userId,
+				montant: req.body.montant,
+				type: req.body.type,
+				categorie: req.body.categorie,
+				description1: req.body.description1,
+				description2: req.body.description2,
+				operationDate: new Date(req.body.operationDate),
+				solde: req.body.solde,
+				user: {
+					connect: { id: req.auth.userId }
+				},
+				compte: {
+					connect: { id: req.body.compteId }
+				}
 			}
 		});
 		res.status(201).json({ message: "Operation enregistré !" });
 	} catch (error) {
+		console.error(error);
 		res.status(400).json({ error });
 	}
 };
