@@ -1,2 +1,6 @@
 node_modules
-config
+config/database.config-prod.js
+.idea
+uploads
+/generated/prisma
+.env

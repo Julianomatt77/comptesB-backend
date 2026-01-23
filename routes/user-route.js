@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const auth = require("../middleware/auth");
+import auth from "../middleware/auth.js";
 
-const userCtrl = require("../controllers/user-ctrl");
+import * as userCtrl from "../controllers/user-ctrl.js";
 
 router.post("/signup", userCtrl.signup);
 router.post("/login", userCtrl.login);
@@ -13,4 +13,4 @@ router.get("/getOneUser/:id", auth, userCtrl.getOneUser);
 
 router.delete("/deleteUser/:id", auth, userCtrl.deleteUser);
 
-module.exports = router;
+export default router;

@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma/client"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  username  String      @unique
+  password  String
+  isDeleted Boolean?    @default(false)
+  oldId     String?
+
+  operations Operation[]
+  comptes    Compte[]
+}
+
+model Operation {
+  id            Int      @id @default(autoincrement())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        Int
+  montant       Float
+  type          Boolean
+  categorie     String
+  compte        Compte   @relation(fields: [compteId], references: [id])
+  compteId      Int
+  description1  String
+  description2  String?
+  operationDate DateTime @default(now())
+  solde         Float
+  oldId         String?
+}
+
+model Compte {
+  id            Int         @id @default(autoincrement())
+  user          User        @relation(fields: [userId], references: [id])
+  userId        Int
+  name          String
+  typeCompte    String
+  soldeInitial  Float
+  soldeActuel   Float
+  isDeleted     Boolean?    @default(false)
+  oldId         String?
+
+  operations    Operation[]
+}
