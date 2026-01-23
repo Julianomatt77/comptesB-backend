@@ -3,7 +3,7 @@ import { prisma } from './lib/prisma'
 async function main() {
     const user = await prisma.user.create({
         data: {
-            username: 'julianomatt',
+            username: 'julianomatt-test',
             email: 'julianomatt@prisma.io',
             password: '123456'
         },

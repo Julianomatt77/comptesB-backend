@@ -1,4 +1,18 @@
 -- CreateTable
+CREATE TABLE `User` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(191) NOT NULL,
+    `username` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NOT NULL,
+    `isDeleted` BOOLEAN NULL DEFAULT false,
+    `oldId` VARCHAR(191) NULL,
+
+    UNIQUE INDEX `User_email_key`(`email`),
+    UNIQUE INDEX `User_username_key`(`username`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Operation` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
@@ -6,12 +20,11 @@ CREATE TABLE `Operation` (
     `type` BOOLEAN NOT NULL,
     `categorie` VARCHAR(191) NOT NULL,
     `compteId` INTEGER NOT NULL,
-    `compteName` VARCHAR(191) NULL,
-    `compteType` VARCHAR(191) NULL,
     `description1` VARCHAR(191) NOT NULL,
     `description2` VARCHAR(191) NULL,
     `operationDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `solde` DOUBLE NOT NULL,
+    `oldId` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -25,27 +38,7 @@ CREATE TABLE `Compte` (
     `soldeInitial` DOUBLE NOT NULL,
     `soldeActuel` DOUBLE NOT NULL,
     `isDeleted` BOOLEAN NULL DEFAULT false,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `OpCommuneUser` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(191) NOT NULL,
-    `userId` INTEGER NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `OpCommune` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `userId` INTEGER NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
-    `montant` DOUBLE NOT NULL,
-    `description` VARCHAR(191) NOT NULL,
-    `operationDate` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `oldId` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -58,9 +51,3 @@ ALTER TABLE `Operation` ADD CONSTRAINT `Operation_compteId_fkey` FOREIGN KEY (`c
 
 -- AddForeignKey
 ALTER TABLE `Compte` ADD CONSTRAINT `Compte_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `OpCommuneUser` ADD CONSTRAINT `OpCommuneUser_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `OpCommune` ADD CONSTRAINT `OpCommune_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

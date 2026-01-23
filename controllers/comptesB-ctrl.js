@@ -553,6 +553,17 @@ export const annualRecapSavingsByAccounts = async (req, res) => {
 
 		// Traiter chaque compte
 		for (const compte of comptes) {
+			// Calculer le solde au 1er janvier (solde initial du compte + toutes les opérations avant le 1er janvier)
+			const operationsBeforeYear = await prisma.operation.aggregate({
+				_sum: { montant: true },
+				where: {
+					compteId: compte.id,
+					operationDate: { lt: startDate }
+				}
+			});
+
+			const soldeInitialAuDebut = Number(compte.soldeInitial) + (operationsBeforeYear._sum.montant || 0);
+
 			// Récupérer les opérations de l'année pour ce compte
 			const operations = await prisma.operation.findMany({
 				where: {
@@ -582,9 +593,8 @@ export const annualRecapSavingsByAccounts = async (req, res) => {
 			}, 0);
 
 			// Calculs pour ce compte
-			const soldeInitial = Number(compte.soldeInitial);
-			const soldeFinal = soldeInitial + investi + operationsMontant;
-			const totalInvesti = soldeInitial + investi;
+			const soldeFinal = soldeInitialAuDebut + investi + operationsMontant;
+			const totalInvesti = soldeInitialAuDebut + investi;
 
 			// Evolution : (gain/perte) / (solde initial + investi)
 			const evolution = totalInvesti === 0 ? 0 :
@@ -592,14 +602,14 @@ export const annualRecapSavingsByAccounts = async (req, res) => {
 
 			yearlyRecap.push({
 				name: compte.name,
-				soldeInitial: Math.round(soldeInitial * 100) / 100,
+				soldeInitial: Math.round(soldeInitialAuDebut * 100) / 100,
 				totalInvesti: Math.round(totalInvesti * 100) / 100,
 				soldeFinal: Math.round(soldeFinal * 100) / 100,
 				evolution: Math.round(evolution * 100) / 100
 			});
 
 			// Accumuler pour le total
-			totalInitial += soldeInitial;
+			totalInitial += soldeInitialAuDebut;
 			totalInvestiGlobal += totalInvesti;
 			totalFinal += soldeFinal;
 		}
