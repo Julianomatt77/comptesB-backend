@@ -56,6 +56,7 @@ export const updateOneOperation = async (req, res, next) => {
 		const {
 			montant,
 			type,
+			compteId,
 			categorie,
 			description1,
 			description2,
@@ -76,9 +77,9 @@ export const updateOneOperation = async (req, res, next) => {
 		};
 
 		if (opData.operationDate) opData.operationDate = new Date(opData.operationDate);
-		if (req.body.operation.compte) {
+		if (req.body.operation.compteId) {
 			opData.compte = {
-				connect: { id: Number(req.body.operation.compte) }
+				connect: { id: Number(req.body.operation.compteId) }
 			};
 		}
 
@@ -88,6 +89,7 @@ export const updateOneOperation = async (req, res, next) => {
 		});
 		res.status(200).json({ message: "Operation modifié!" });
 	} catch (error) {
+		console.error(error);
 		res.status(401).json({ error });
 	}
 };
