@@ -434,11 +434,26 @@ export const annualRecapSavingAccounts = async (req, res) => {
 		}
 
 		const compteIds = comptes.map(c => c.id);
-
-		// Récupérer toutes les opérations de l'année
-		const startDate = new Date(`${year}-01-01`);
+		const startDate = new Date(`${year}-01-01T00:00:00`);
 		const endDate = new Date(`${year}-12-31T23:59:59`);
 
+		// Solde de départ des comptes (au moment de leur création)
+		const soldeInitialComptes = comptes.reduce((sum, c) => sum + Number(c.soldeInitial), 0);
+
+		// Opérations survenues AVANT le 1er janvier de l'année demandée
+		const operationsAvant = await prisma.operation.findMany({
+			where: {
+				userId: userId,
+				compteId: { in: compteIds },
+				operationDate: { lt: startDate }
+			}
+		});
+		const totalAvant = operationsAvant.reduce((sum, op) => sum + Number(op.montant), 0);
+
+		// Solde réel au 1er janvier de l'année demandée
+		const soldeDebutAnnee = soldeInitialComptes + totalAvant;
+
+		// Opérations de l'année demandée
 		const operations = await prisma.operation.findMany({
 			where: {
 				userId: userId,
@@ -456,7 +471,7 @@ export const annualRecapSavingAccounts = async (req, res) => {
 
 		// Générer le récapitulatif mensuel
 		const monthlyRecap = [];
-		let soldeCumul = soldeInitial;
+		let soldeCumul = soldeDebutAnnee;
 
 		for (let month = 1; month <= 12; month++) {
 			// Filtrer les opérations du mois
@@ -496,14 +511,13 @@ export const annualRecapSavingAccounts = async (req, res) => {
 		const totalInvesti = monthlyRecap.reduce((sum, m) => sum + m.investi, 0);
 		const soldeFinal = monthlyRecap[11].solde;
 
-		// Evolution basée sur le total investi + solde initial
-		const baseInvestissement = soldeInitial + totalInvesti;
+		const baseInvestissement = soldeDebutAnnee + totalInvesti;
 		const evolution = baseInvestissement === 0 ? 0 :
 			((soldeFinal - baseInvestissement) / baseInvestissement) * 100;
 
 		res.status(200).json({
 			monthlyRecap,
-			soldeInitial: Math.round(soldeInitial * 100) / 100,
+			soldeInitial: Math.round(soldeDebutAnnee * 100) / 100,
 			soldeFinal: Math.round(soldeFinal * 100) / 100,
 			totalInvesti: Math.round(totalInvesti * 100) / 100,
 			evolution: Math.round(evolution * 100) / 100
