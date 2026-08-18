@@ -467,7 +467,7 @@ export const annualRecapSavingAccounts = async (req, res) => {
 
 			// Calculer les investissements (transferts positifs)
 			const investi = monthOperations.reduce((sum, op) => {
-				if (op.categorie === 'Transfert' && Number(op.montant) > 0) {
+				if (op.categorie === 'Transfert') {
 					return sum + Number(op.montant);
 				}
 				return sum;
@@ -578,7 +578,7 @@ export const annualRecapSavingsByAccounts = async (req, res) => {
 
 			// Calculer les investissements (transferts positifs)
 			const investi = operations.reduce((sum, op) => {
-				if (op.categorie === 'Transfert' && Number(op.montant) > 0) {
+				if (op.categorie === 'Transfert') {
 					return sum + Number(op.montant);
 				}
 				return sum;
